@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>달의 모양 변화 시뮬레이터</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="simulator-container">
+            <h1>🌙 달의 모양 변화 관찰하기</h1>
+            <p class="subtitle">달이 매일매일 어떻게 변하는지 관찰해볼까요?</p>
+
+            <div class="day-display">
+                <span id="currentDay">1일째</span>
+            </div>
+
+            <div class="phase-name">
+                <span id="phaseName">초승달</span>
+            </div>
+
+            <div class="moon-canvas-container">
+                <canvas id="moonCanvas" width="400" height="400"></canvas>
+            </div>
+
+            <div class="controls">
+                <button id="prevDay">◀ 이전 날</button>
+                <button id="playPause">▶ 재생</button>
+                <button id="nextDay">다음 날 ▶</button>
+            </div>
+
+            <div class="controls">
+                <button id="reset">처음으로</button>
+                <button id="goToQuiz" class="btn-primary">시뮬레이션 완료! 퀴즈 풀기</button>
+            </div>
+
+            <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                <h3 style="color: #2a5298; margin-bottom: 10px;">💡 알아두기</h3>
+                <p style="line-height: 1.6; color: #555;">
+                    달은 약 29.5일을 주기로 모양이 변해요.
+                    초승달 → 상현달 → 보름달 → 하현달 → 그믐달을 거쳐 다시 초승달이 됩니다.
+                    재생 버튼을 눌러 달의 변화를 관찰해보세요!
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/simulator.js"></script>
+</body>
+</html>

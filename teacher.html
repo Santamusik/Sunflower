@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>교사 대시보드</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="teacher-container">
+            <div class="dashboard-header">
+                <h1>📊 교사 대시보드</h1>
+                <button id="clearData" class="btn-secondary">데이터 초기화</button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalStudents">0</div>
+                    <div class="stat-label">총 학생 수</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avgScore">0%</div>
+                    <div class="stat-label">평균 점수</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="perfectScores">0</div>
+                    <div class="stat-label">만점 학생</div>
+                </div>
+            </div>
+
+            <h2 style="margin: 30px 0 15px 0; color: #2a5298;">학생별 성적</h2>
+            <div id="studentList" class="student-list">
+                <!-- Student cards will be added here -->
+            </div>
+
+            <div class="feedback-section">
+                <h3>📚 부족한 개념별 지도 방안</h3>
+                <div id="conceptFeedback">
+                    <!-- Concept feedback will be added here -->
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn-primary" onclick="window.location.href='index.html'">학생 페이지로 돌아가기</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/teacher.js"></script>
+</body>
+</html>
