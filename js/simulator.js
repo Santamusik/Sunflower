@@ -17,16 +17,26 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
-    // Load real moon image
+    // Load actual moon image
     moonImage = new Image();
     moonImage.crossOrigin = "anonymous";
 
-    // Use a high-quality moon image (from NASA or similar)
-    // For now, we'll create a realistic one procedurally
-    createRealisticMoonImage().then(() => {
+    // Use high-quality moon image from reliable source
+    moonImage.src = 'https://images.unsplash.com/photo-1526039330210-c60a84fe1f99?w=800&q=80';
+
+    moonImage.onload = () => {
         imageLoaded = true;
         updateMoon();
-    });
+    };
+
+    moonImage.onerror = () => {
+        console.log('Failed to load external image, using fallback');
+        // Fallback: create simple moon texture
+        createSimpleMoonTexture().then(() => {
+            imageLoaded = true;
+            updateMoon();
+        });
+    };
 
     // Event listeners
     document.getElementById('prevDay').addEventListener('click', () => {
@@ -88,9 +98,9 @@ document.addEventListener('DOMContentLoaded', function() {
         updateMoon();
     }
 
-    function createRealisticMoonImage() {
+    function createSimpleMoonTexture() {
         return new Promise((resolve) => {
-            const size = 400;
+            const size = 500;
             const tempCanvas = document.createElement('canvas');
             tempCanvas.width = size;
             tempCanvas.height = size;
@@ -100,123 +110,20 @@ document.addEventListener('DOMContentLoaded', function() {
             const centerY = size / 2;
             const radius = size / 2;
 
-            // Create base moon with radial gradient
+            // Simple gradient moon
             const gradient = tempCtx.createRadialGradient(
-                centerX - radius * 0.2, centerY - radius * 0.2, 0,
+                centerX - radius * 0.25, centerY - radius * 0.25, radius * 0.1,
                 centerX, centerY, radius
             );
-            gradient.addColorStop(0, '#fafaf8');
-            gradient.addColorStop(0.3, '#f0f0ea');
-            gradient.addColorStop(0.6, '#e0e0d8');
-            gradient.addColorStop(0.85, '#c8c8b8');
-            gradient.addColorStop(1, '#a0a090');
+            gradient.addColorStop(0, '#ffffff');
+            gradient.addColorStop(0.4, '#f5f5f0');
+            gradient.addColorStop(0.7, '#e0e0d5');
+            gradient.addColorStop(1, '#b0b0a0');
 
             tempCtx.fillStyle = gradient;
             tempCtx.beginPath();
             tempCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
             tempCtx.fill();
-
-            // Add large craters (inspired by real moon features)
-            const largeCraters = [
-                { x: 0.3, y: -0.2, r: 0.2, depth: 0.7 },
-                { x: -0.25, y: 0.3, r: 0.15, depth: 0.6 },
-                { x: 0.15, y: 0.4, r: 0.12, depth: 0.5 },
-                { x: -0.4, y: -0.15, r: 0.18, depth: 0.65 },
-            ];
-
-            largeCraters.forEach(crater => {
-                const cx = centerX + crater.x * radius;
-                const cy = centerY + crater.y * radius;
-                const r = crater.r * radius;
-
-                // Crater floor (dark)
-                const craterGrad = tempCtx.createRadialGradient(cx, cy, 0, cx, cy, r);
-                craterGrad.addColorStop(0, `rgba(60, 60, 55, ${crater.depth * 0.4})`);
-                craterGrad.addColorStop(0.7, `rgba(80, 80, 75, ${crater.depth * 0.3})`);
-                craterGrad.addColorStop(1, 'rgba(100, 100, 95, 0)');
-
-                tempCtx.fillStyle = craterGrad;
-                tempCtx.beginPath();
-                tempCtx.arc(cx, cy, r, 0, Math.PI * 2);
-                tempCtx.fill();
-
-                // Crater rim (bright)
-                tempCtx.strokeStyle = `rgba(255, 255, 250, ${crater.depth * 0.2})`;
-                tempCtx.lineWidth = 2;
-                tempCtx.beginPath();
-                tempCtx.arc(cx - r * 0.15, cy - r * 0.15, r * 0.9, Math.PI * 0.8, Math.PI * 1.3);
-                tempCtx.stroke();
-            });
-
-            // Add medium craters
-            const mediumCraters = [
-                { x: 0.5, y: 0.15, r: 0.1, depth: 0.5 },
-                { x: -0.15, y: -0.35, r: 0.12, depth: 0.55 },
-                { x: 0.25, y: 0.2, r: 0.08, depth: 0.45 },
-                { x: -0.5, y: 0.1, r: 0.09, depth: 0.5 },
-            ];
-
-            mediumCraters.forEach(crater => {
-                const cx = centerX + crater.x * radius;
-                const cy = centerY + crater.y * radius;
-                const r = crater.r * radius;
-
-                const craterGrad = tempCtx.createRadialGradient(cx, cy, 0, cx, cy, r);
-                craterGrad.addColorStop(0, `rgba(70, 70, 65, ${crater.depth * 0.35})`);
-                craterGrad.addColorStop(1, 'rgba(100, 100, 95, 0)');
-
-                tempCtx.fillStyle = craterGrad;
-                tempCtx.beginPath();
-                tempCtx.arc(cx, cy, r, 0, Math.PI * 2);
-                tempCtx.fill();
-            });
-
-            // Add maria (dark regions - lunar seas)
-            const maria = [
-                { x: -0.2, y: 0.25, r: 0.3, opacity: 0.2 },
-                { x: 0.3, y: -0.15, r: 0.25, opacity: 0.18 },
-                { x: -0.35, y: -0.25, r: 0.22, opacity: 0.15 },
-            ];
-
-            maria.forEach(mare => {
-                const mx = centerX + mare.x * radius;
-                const my = centerY + mare.y * radius;
-                const r = mare.r * radius;
-
-                const mareGrad = tempCtx.createRadialGradient(mx, my, 0, mx, my, r);
-                mareGrad.addColorStop(0, `rgba(80, 80, 70, ${mare.opacity})`);
-                mareGrad.addColorStop(1, 'rgba(80, 80, 70, 0)');
-
-                tempCtx.fillStyle = mareGrad;
-                tempCtx.beginPath();
-                tempCtx.arc(mx, my, r, 0, Math.PI * 2);
-                tempCtx.fill();
-            });
-
-            // Add small craters for detail
-            for (let i = 0; i < 30; i++) {
-                const angle = Math.random() * Math.PI * 2;
-                const dist = Math.random() * 0.85;
-                const cx = centerX + Math.cos(angle) * dist * radius;
-                const cy = centerY + Math.sin(angle) * dist * radius;
-                const r = 3 + Math.random() * 8;
-
-                tempCtx.fillStyle = `rgba(60, 60, 55, ${0.15 + Math.random() * 0.15})`;
-                tempCtx.beginPath();
-                tempCtx.arc(cx, cy, r, 0, Math.PI * 2);
-                tempCtx.fill();
-            }
-
-            // Add texture noise
-            const imageData = tempCtx.getImageData(0, 0, size, size);
-            const data = imageData.data;
-            for (let i = 0; i < data.length; i += 4) {
-                const noise = (Math.random() - 0.5) * 12;
-                data[i] += noise;
-                data[i + 1] += noise;
-                data[i + 2] += noise;
-            }
-            tempCtx.putImageData(imageData, 0, 0);
 
             moonImage.src = tempCanvas.toDataURL();
             moonImage.onload = () => resolve();
@@ -224,7 +131,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function getMoonPhase(day) {
-        // phase: 0 = new moon, 0.5 = full moon, 1 = new moon
         return (day - 1) / 29.5;
     }
 
@@ -248,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const centerY = canvas.height / 2;
         const radius = 150;
 
-        // Clear and draw night sky
+        // Night sky background
         const skyGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, canvas.width);
         skyGrad.addColorStop(0, '#1a1a3e');
         skyGrad.addColorStop(1, '#0a0a1e');
@@ -258,175 +164,170 @@ document.addEventListener('DOMContentLoaded', function() {
         // Draw stars
         drawStars();
 
-        // Get moon phase
+        // Get phase (0 to 1)
         const phase = getMoonPhase(currentDay);
 
-        // Draw moon with phase
-        drawMoonWithPhase(centerX, centerY, radius, phase);
+        // Draw moon with correct phase
+        drawMoonPhase(centerX, centerY, radius, phase);
 
-        // Add glow
-        const glowGrad = ctx.createRadialGradient(centerX, centerY, radius, centerX, centerY, radius + 25);
-        glowGrad.addColorStop(0, 'rgba(255, 255, 240, 0.4)');
-        glowGrad.addColorStop(1, 'rgba(255, 255, 240, 0)');
+        // Glow effect
+        const glowGrad = ctx.createRadialGradient(centerX, centerY, radius, centerX, centerY, radius + 30);
+        glowGrad.addColorStop(0, 'rgba(255, 255, 245, 0.5)');
+        glowGrad.addColorStop(1, 'rgba(255, 255, 245, 0)');
         ctx.fillStyle = glowGrad;
         ctx.beginPath();
-        ctx.arc(centerX, centerY, radius + 25, 0, Math.PI * 2);
+        ctx.arc(centerX, centerY, radius + 30, 0, Math.PI * 2);
         ctx.fill();
     }
 
-    function drawMoonWithPhase(cx, cy, radius, phase) {
-        // phase: 0-1 where 0=new, 0.5=full, 1=new
-
+    function drawMoonPhase(cx, cy, radius, phase) {
         ctx.save();
 
-        // Calculate how much of moon is illuminated
-        // 0-0.5: waxing (growing from right)
-        // 0.5-1: waning (shrinking from right)
-
-        let illumination;
-        if (phase <= 0.5) {
-            // Waxing: 0 to 1
-            illumination = phase * 2;
-        } else {
-            // Waning: 1 to 0
-            illumination = 2 - (phase * 2);
-        }
-
-        // Draw moon base (full circle, will be masked)
-        ctx.save();
+        // Clip to circle
         ctx.beginPath();
         ctx.arc(cx, cy, radius, 0, Math.PI * 2);
         ctx.clip();
 
-        // Fill dark background
+        // Dark background
         ctx.fillStyle = '#0a0a1e';
         ctx.fillRect(cx - radius, cy - radius, radius * 2, radius * 2);
 
-        // Now draw the illuminated part
-        if (phase <= 0.5) {
-            // Waxing: light appears from right, grows left
-            drawWaxingPhase(cx, cy, radius, illumination);
+        // Calculate illumination
+        // phase 0 = new moon, 0.5 = full moon, 1 = new moon
+        let illuminatedFraction;
+        let isWaxing;
+
+        if (phase < 0.5) {
+            // Waxing (growing)
+            illuminatedFraction = phase * 2; // 0 to 1
+            isWaxing = true;
         } else {
-            // Waning: light disappears from right, remains on left
-            drawWaningPhase(cx, cy, radius, illumination);
+            // Waning (shrinking)
+            illuminatedFraction = 2 - (phase * 2); // 1 to 0
+            isWaxing = false;
         }
+
+        // Draw illuminated part
+        ctx.save();
+
+        // Create clipping path for illuminated region
+        ctx.beginPath();
+
+        if (illuminatedFraction === 0) {
+            // New moon - no illumination (already dark)
+            ctx.restore();
+            ctx.restore();
+            return;
+        }
+
+        if (illuminatedFraction >= 0.99) {
+            // Full moon - draw entire moon
+            ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+            ctx.clip();
+            ctx.drawImage(moonImage, cx - radius, cy - radius, radius * 2, radius * 2);
+            ctx.restore();
+            ctx.restore();
+            return;
+        }
+
+        // Calculate the position of the terminator (shadow line)
+        // For waxing: light comes from right
+        // For waning: light comes from left
+
+        if (isWaxing) {
+            // Waxing moon (light from right)
+            if (illuminatedFraction <= 0.5) {
+                // Crescent - right side only
+                drawCrescent(ctx, cx, cy, radius, illuminatedFraction, true);
+            } else {
+                // Gibbous - mostly lit, shadow on left
+                drawGibbous(ctx, cx, cy, radius, illuminatedFraction, true);
+            }
+        } else {
+            // Waning moon (light from left)
+            if (illuminatedFraction <= 0.5) {
+                // Crescent - left side only
+                drawCrescent(ctx, cx, cy, radius, illuminatedFraction, false);
+            } else {
+                // Gibbous - mostly lit, shadow on right
+                drawGibbous(ctx, cx, cy, radius, illuminatedFraction, false);
+            }
+        }
+
+        ctx.drawImage(moonImage, cx - radius, cy - radius, radius * 2, radius * 2);
 
         ctx.restore();
         ctx.restore();
     }
 
-    function drawWaxingPhase(cx, cy, radius, illumination) {
-        // illumination: 0 (new) to 1 (full)
+    function drawCrescent(ctx, cx, cy, radius, fraction, isRight) {
+        // fraction: 0 to 0.5
+        // Draw a crescent shape
 
-        ctx.save();
+        ctx.beginPath();
 
-        if (illumination <= 0.5) {
-            // Crescent to first quarter (0 to 0.5)
-            // Only right side visible with ellipse
-            ctx.beginPath();
+        if (isRight) {
+            // Right crescent (waxing)
             ctx.arc(cx, cy, radius, -Math.PI/2, Math.PI/2); // Right semicircle
 
-            // Ellipse for shadow boundary
-            const ellipseWidth = radius * (illumination * 2);
-            ctx.ellipse(cx, cy, ellipseWidth, radius, 0, Math.PI/2, -Math.PI/2, true);
-
-            ctx.closePath();
-            ctx.clip();
-
-            // Draw moon image
-            ctx.drawImage(moonImage, cx - radius, cy - radius, radius * 2, radius * 2);
-
+            // Inner curve (shadow boundary)
+            const curveOffset = radius * (1 - fraction * 2);
+            ctx.ellipse(cx, cy, curveOffset, radius, 0, Math.PI/2, -Math.PI/2, true);
         } else {
-            // First quarter to full (0.5 to 1)
-            // Right half always visible, left side growing
-
-            // Draw right half
-            ctx.save();
-            ctx.beginPath();
-            ctx.arc(cx, cy, radius, -Math.PI/2, Math.PI/2);
-            ctx.closePath();
-            ctx.clip();
-            ctx.drawImage(moonImage, cx - radius, cy - radius, radius * 2, radius * 2);
-            ctx.restore();
-
-            // Draw growing left side
-            const leftIllumination = (illumination - 0.5) * 2; // 0 to 1
-            ctx.save();
-            ctx.beginPath();
+            // Left crescent (waning)
             ctx.arc(cx, cy, radius, Math.PI/2, -Math.PI/2); // Left semicircle
 
-            const ellipseWidth = radius * leftIllumination;
-            ctx.ellipse(cx, cy, ellipseWidth, radius, 0, -Math.PI/2, Math.PI/2, true);
-
-            ctx.closePath();
-            ctx.clip();
-            ctx.drawImage(moonImage, cx - radius, cy - radius, radius * 2, radius * 2);
-            ctx.restore();
+            // Inner curve
+            const curveOffset = radius * (1 - fraction * 2);
+            ctx.ellipse(cx, cy, curveOffset, radius, 0, -Math.PI/2, Math.PI/2, true);
         }
 
-        ctx.restore();
+        ctx.closePath();
+        ctx.clip();
     }
 
-    function drawWaningPhase(cx, cy, radius, illumination) {
-        // illumination: 1 (full) to 0 (new)
+    function drawGibbous(ctx, cx, cy, radius, fraction, isRight) {
+        // fraction: 0.5 to 1
+        // Draw a gibbous shape (mostly full with shadow on one side)
 
-        ctx.save();
+        const shadowFraction = 1 - fraction; // How much is in shadow
 
-        if (illumination >= 0.5) {
-            // Full to last quarter (1 to 0.5)
-            // Left half always visible, right side shrinking
-
-            // Draw left half
-            ctx.save();
+        if (isRight) {
+            // Right side lit, left side has shadow (waxing gibbous)
             ctx.beginPath();
-            ctx.arc(cx, cy, radius, Math.PI/2, -Math.PI/2);
+            ctx.arc(cx, cy, radius, 0, Math.PI * 2); // Full circle
+
+            // Cut out left shadow
+            const shadowWidth = radius * shadowFraction * 2;
+            ctx.moveTo(cx, cy - radius);
+            ctx.arc(cx, cy, radius, -Math.PI/2, Math.PI/2); // Right side
+            ctx.ellipse(cx, cy, shadowWidth, radius, 0, Math.PI/2, -Math.PI/2, true);
             ctx.closePath();
             ctx.clip();
-            ctx.drawImage(moonImage, cx - radius, cy - radius, radius * 2, radius * 2);
-            ctx.restore();
-
-            // Draw shrinking right side
-            const rightIllumination = (illumination - 0.5) * 2; // 1 to 0
-            ctx.save();
-            ctx.beginPath();
-            ctx.arc(cx, cy, radius, -Math.PI/2, Math.PI/2); // Right semicircle
-
-            const ellipseWidth = radius * rightIllumination;
-            ctx.ellipse(cx, cy, ellipseWidth, radius, 0, Math.PI/2, -Math.PI/2, true);
-
-            ctx.closePath();
-            ctx.clip();
-            ctx.drawImage(moonImage, cx - radius, cy - radius, radius * 2, radius * 2);
-            ctx.restore();
 
         } else {
-            // Last quarter to new (0.5 to 0)
-            // Only left side visible with ellipse
+            // Left side lit, right side has shadow (waning gibbous)
             ctx.beginPath();
-            ctx.arc(cx, cy, radius, Math.PI/2, -Math.PI/2); // Left semicircle
+            ctx.arc(cx, cy, radius, 0, Math.PI * 2); // Full circle
 
-            // Ellipse for shadow boundary
-            const ellipseWidth = radius * (illumination * 2);
-            ctx.ellipse(cx, cy, ellipseWidth, radius, 0, -Math.PI/2, Math.PI/2, true);
-
+            // Cut out right shadow
+            const shadowWidth = radius * shadowFraction * 2;
+            ctx.moveTo(cx, cy - radius);
+            ctx.arc(cx, cy, radius, Math.PI/2, -Math.PI/2); // Left side
+            ctx.ellipse(cx, cy, shadowWidth, radius, 0, -Math.PI/2, Math.PI/2, true);
             ctx.closePath();
             ctx.clip();
-
-            // Draw moon image
-            ctx.drawImage(moonImage, cx - radius, cy - radius, radius * 2, radius * 2);
         }
-
-        ctx.restore();
     }
 
     function drawStars() {
         ctx.save();
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 120; i++) {
             const seed = i * 9876;
             const x = (seed % canvas.width);
             const y = ((seed * 13) % canvas.height);
-            const size = 0.5 + ((seed % 15) / 15) * 1.5;
-            const brightness = 0.3 + Math.random() * 0.7;
+            const size = 0.5 + ((seed % 20) / 20) * 2;
+            const brightness = 0.2 + Math.random() * 0.8;
 
             ctx.fillStyle = `rgba(255, 255, 255, ${brightness})`;
             ctx.beginPath();
